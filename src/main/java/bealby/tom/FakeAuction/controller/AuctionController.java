@@ -10,10 +10,12 @@ import org.springframework.web.client.RestTemplate;
 public class AuctionController {
 	private String status = "Open";
 	private RestTemplate restTemplate = new RestTemplate();
+	private boolean isRequestReceivedToJoinAuction = false;
 
 	@RequestMapping("/receiveJoinRequest")
 	public ResponseEntity<String> receiveJoinRequest() {
 		System.out.println("Received a request to join the auction");
+		isRequestReceivedToJoinAuction = true;
 		return ResponseEntity.ok("Received a request to join the auction");
 	}
 	
@@ -23,7 +25,13 @@ public class AuctionController {
 		status = "Closed";
 		return sendRequest();
 	}
-	
+
+	@RequestMapping("/getReceiveStatus")
+	public ResponseEntity<String> getReceiveStatus() {
+		System.out.println("Received a request to join the auction:" + isRequestReceivedToJoinAuction);
+		return ResponseEntity.ok("ReceiveStatus:" + isRequestReceivedToJoinAuction);
+	}
+
 	@RequestMapping("/getStatus")
 	public ResponseEntity<String> getStatus() {
 		System.out.println("Received a request to show my status");
