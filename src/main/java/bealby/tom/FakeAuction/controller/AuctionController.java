@@ -36,13 +36,13 @@ public class AuctionController {
 
 	@RequestMapping("/getReceiveStatus")
 	public ResponseEntity<String> getReceiveStatus() {
-		System.out.println("Received a request to join the auction:" + isRequestReceivedToJoinAuction);
+		System.out.println("Received a request to check my receive status:" + isRequestReceivedToJoinAuction);
 		return ResponseEntity.ok("ReceiveStatus:" + isRequestReceivedToJoinAuction);
 	}
 
 	@RequestMapping("/getStatus")
 	public ResponseEntity<String> getStatus() {
-		System.out.println("Received a request to show my status");
+		System.out.println("Received a request to show my status. My current status is:" + status);
 		return ResponseEntity.ok("current status:" + status);
 	}
 
