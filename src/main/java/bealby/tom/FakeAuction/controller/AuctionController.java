@@ -18,6 +18,13 @@ public class AuctionController {
 		isRequestReceivedToJoinAuction = true;
 		return ResponseEntity.ok("Received a request to join the auction");
 	}
+
+	@RequestMapping("/openAuction")
+	public ResponseEntity<String> openAuction() {
+		System.out.println("start auction with status open");
+		status = "Open";
+		return sendRequest();
+	}
 	
 	@RequestMapping("/closeAuction")
 	public ResponseEntity<String> closeAuction() {
