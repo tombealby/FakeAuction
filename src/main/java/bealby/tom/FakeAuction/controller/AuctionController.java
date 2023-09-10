@@ -23,12 +23,13 @@ public class AuctionController {
 	public ResponseEntity<String> openAuction() {
 		System.out.println("start auction with status open");
 		status = "Open";
-		return sendRequest();
+		return ResponseEntity.ok("successfully opened the auction");
 	}
 	
 	@RequestMapping("/closeAuction")
 	public ResponseEntity<String> closeAuction() {
-		System.out.println("notify clients that auction is closed");
+		System.out.println("Received a request to close the auction. I will notify "
+				+ "clients that auction is closed");
 		status = "Closed";
 		return sendRequest();
 	}
