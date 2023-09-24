@@ -31,7 +31,7 @@ public class AuctionController {
 		System.out.println("Received a request to close the auction. I will notify "
 				+ "clients that auction is closed");
 		status = "Closed";
-		return sendRequest();
+		return notifyParticipantsThatAuctionHasClosed();
 	}
 
 	@RequestMapping("/getReceiveStatus")
@@ -46,7 +46,7 @@ public class AuctionController {
 		return ResponseEntity.ok("current status:" + status);
 	}
 
-	private ResponseEntity<String> sendRequest() throws HttpClientErrorException {
+	private ResponseEntity<String> notifyParticipantsThatAuctionHasClosed() throws HttpClientErrorException {
 	    final String url = "http://localhost:8092/receiveAuctionMessage";
 		return restTemplate.getForEntity(url, String.class);
 	}
