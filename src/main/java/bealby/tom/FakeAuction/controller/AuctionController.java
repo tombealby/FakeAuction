@@ -1,5 +1,8 @@
 package bealby.tom.FakeAuction.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,8 +17,8 @@ public class AuctionController {
 	private boolean isRequestReceivedToJoinAuction = false;
 	private int currentPrice;
 	private int priceIncrement;
-	private int theLatestBidThatIHaveReceived;
 	private String currentWinningBidder;
+	private Map<String, Integer> bidsByBidders;
 
 	@RequestMapping("/receiveJoinRequest")
 	public ResponseEntity<String> receiveJoinRequest() {
@@ -26,6 +29,8 @@ public class AuctionController {
 
 	@RequestMapping("/openAuction")
 	public ResponseEntity<String> openAuction() {
+		this.bidsByBidders = new HashMap<>();
+		this.currentWinningBidder = "other bidder";
 		System.out.println("start auction with status open");
 		status = "Open";
 		return ResponseEntity.ok("successfully opened the auction");
@@ -62,7 +67,6 @@ public class AuctionController {
 			@RequestParam("winningBidder") String winningBidder) {
 		this.currentPrice = currentPrice;
 		this.priceIncrement = priceIncrement;
-		this.currentWinningBidder = winningBidder;
 		System.out.println("Auction has been told that current price is " + currentPrice + ", and"
 				+ " price increment is " + priceIncrement + " and winning bidder of \"" + winningBidder
 				+ "\". Auction will notify participants of this information.");
@@ -78,16 +82,17 @@ public class AuctionController {
 	}
 
 	@RequestMapping("/getLatestBid")
-	public ResponseEntity<String> getLatestBid() {
-		System.out.println("Received a request to show the latest bid that I have received. My latest bid is:"
-				+ theLatestBidThatIHaveReceived);
-		return ResponseEntity.ok("The latest bid received is:" + theLatestBidThatIHaveReceived);
+	public ResponseEntity<String> getBidForBidder(@RequestParam("bidder") String bidder) {
+		System.out.println("Received a request to show the latest bid for \"" + bidder + "\". The latest bid"
+				+ " that I have received for \"" + bidder + "\" is:"
+				+ bidsByBidders.get(bidder));
+		return ResponseEntity.ok("The latest bid received from \"" + bidder + "\" is:" + bidsByBidders.get(bidder));
 	}
 
 	@RequestMapping("/receiveBid")
-	public ResponseEntity<String> receiveBid(@RequestParam("bid") int bid) {
-		System.out.println("I have received a bit of " + bid);
-		this.theLatestBidThatIHaveReceived = bid;
+	public ResponseEntity<String> receiveBid(@RequestParam("bid") int bid, @RequestParam("bidderId") String bidderId) {
+		System.out.println("I have received a bid of " + bid + " from " + bidderId);
+		bidsByBidders.put(bidderId, bid);
 		return ResponseEntity.ok("Thanks for your bid of " + bid);
 	}
 }
