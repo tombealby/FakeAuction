@@ -14,6 +14,7 @@ public class AuctionController {
 	private boolean isRequestReceivedToJoinAuction = false;
 	private int currentPrice;
 	private int priceIncrement;
+	private int theLatestBidThatIHaveReceived;
 
 	@RequestMapping("/receiveJoinRequest")
 	public ResponseEntity<String> receiveJoinRequest() {
@@ -69,5 +70,19 @@ public class AuctionController {
 	    final String url = "http://localhost:8092/priceNotification?currentPrice=" + this.currentPrice +
 	    		"&priceIncrement=" + this.priceIncrement;
 		return restTemplate.getForEntity(url, String.class);
+	}
+
+	@RequestMapping("/getLatestBid")
+	public ResponseEntity<String> getLatestBid() {
+		System.out.println("Received a request to show the latest bid that I have received. My latest bid is:"
+				+ theLatestBidThatIHaveReceived);
+		return ResponseEntity.ok("The latest bid received is:" + theLatestBidThatIHaveReceived);
+	}
+
+	@RequestMapping("/receiveBid")
+	public ResponseEntity<String> receiveBid(@RequestParam("bid") int bid) {
+		System.out.println("I have received a bit of " + bid);
+		this.theLatestBidThatIHaveReceived = bid;
+		return ResponseEntity.ok("Thanks for your bid of " + bid);
 	}
 }
