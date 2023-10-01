@@ -15,6 +15,7 @@ public class AuctionController {
 	private int currentPrice;
 	private int priceIncrement;
 	private int theLatestBidThatIHaveReceived;
+	private String currentWinningBidder;
 
 	@RequestMapping("/receiveJoinRequest")
 	public ResponseEntity<String> receiveJoinRequest() {
@@ -56,19 +57,23 @@ public class AuctionController {
 	}
 
 	@RequestMapping("/reportPriceAndIncrement")
-	public ResponseEntity<String> reportPriceAndIncrementToParticipants(@RequestParam("currentPrice") Integer currentPrice,
-			@RequestParam("priceIncrement") Integer priceIncrement) {
+	public ResponseEntity<String> reportPriceAndIncrementAndWinningBidderToParticipants(
+			@RequestParam("currentPrice") Integer currentPrice, @RequestParam("priceIncrement") Integer priceIncrement,
+			@RequestParam("winningBidder") String winningBidder) {
 		this.currentPrice = currentPrice;
 		this.priceIncrement = priceIncrement;
+		this.currentWinningBidder = winningBidder;
 		System.out.println("Auction has been told that current price is " + currentPrice + ", and"
-				+ " price increment is " + priceIncrement + ". Auction will notify participants of this information.");
-		notifyParticipantsOfPriceAndIncrement();
+				+ " price increment is " + priceIncrement + " and winning bidder of \"" + winningBidder
+				+ "\". Auction will notify participants of this information.");
+		notifyParticipantsOfPriceAndIncrementAndWinningBidder();
 		return ResponseEntity.ok("");
 	}
 
-	private ResponseEntity<String> notifyParticipantsOfPriceAndIncrement() throws HttpClientErrorException {
-	    final String url = "http://localhost:8092/priceNotification?currentPrice=" + this.currentPrice +
-	    		"&priceIncrement=" + this.priceIncrement;
+	private ResponseEntity<String> notifyParticipantsOfPriceAndIncrementAndWinningBidder()
+			throws HttpClientErrorException {
+		final String url = "http://localhost:8092/priceNotification?currentPrice=" + this.currentPrice
+				+ "&priceIncrement=" + this.priceIncrement + "&winningBidder=" + this.currentWinningBidder;
 		return restTemplate.getForEntity(url, String.class);
 	}
 
