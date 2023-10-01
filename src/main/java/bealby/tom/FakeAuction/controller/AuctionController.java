@@ -2,6 +2,7 @@ package bealby.tom.FakeAuction.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -11,6 +12,8 @@ public class AuctionController {
 	private String status = "Open";
 	private RestTemplate restTemplate = new RestTemplate();
 	private boolean isRequestReceivedToJoinAuction = false;
+	private int currentPrice;
+	private int priceIncrement;
 
 	@RequestMapping("/receiveJoinRequest")
 	public ResponseEntity<String> receiveJoinRequest() {
@@ -48,6 +51,23 @@ public class AuctionController {
 
 	private ResponseEntity<String> notifyParticipantsThatAuctionHasClosed() throws HttpClientErrorException {
 	    final String url = "http://localhost:8092/receiveAuctionMessage";
+		return restTemplate.getForEntity(url, String.class);
+	}
+
+	@RequestMapping("/reportPriceAndIncrement")
+	public ResponseEntity<String> reportPriceAndIncrementToParticipants(@RequestParam("currentPrice") Integer currentPrice,
+			@RequestParam("priceIncrement") Integer priceIncrement) {
+		this.currentPrice = currentPrice;
+		this.priceIncrement = priceIncrement;
+		System.out.println("Auction has been told that current price is " + currentPrice + ", and"
+				+ " price increment is " + priceIncrement + ". Auction will notify participants of this information.");
+		notifyParticipantsOfPriceAndIncrement();
+		return ResponseEntity.ok("");
+	}
+
+	private ResponseEntity<String> notifyParticipantsOfPriceAndIncrement() throws HttpClientErrorException {
+	    final String url = "http://localhost:8092/priceNotification?currentPrice=" + this.currentPrice +
+	    		"&priceIncrement=" + this.priceIncrement;
 		return restTemplate.getForEntity(url, String.class);
 	}
 }
