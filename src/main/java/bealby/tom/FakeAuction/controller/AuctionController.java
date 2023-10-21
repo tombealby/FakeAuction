@@ -3,6 +3,7 @@ package bealby.tom.FakeAuction.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -92,7 +93,17 @@ public class AuctionController {
 	@RequestMapping("/receiveBid")
 	public ResponseEntity<String> receiveBid(@RequestParam("bid") int bid, @RequestParam("bidderId") String bidderId) {
 		System.out.println("I have received a bid of " + bid + " from " + bidderId);
-		bidsByBidders.put(bidderId, bid);
-		return ResponseEntity.ok("Thanks for your bid of " + bid);
+		if (isValidBid(bid)) {
+			currentPrice = bid;
+			bidsByBidders.put(bidderId, bid);
+			return ResponseEntity.ok("Thanks for your bid of " + bid + ". Your bid has been accepted");
+		} else {
+			return new ResponseEntity<String>("You have made an invalid bid.", HttpStatus.BAD_REQUEST);
+		}
+
+	}
+
+	private boolean isValidBid(int bid) {
+		return bid >= (currentPrice + priceIncrement);
 	}
 }
