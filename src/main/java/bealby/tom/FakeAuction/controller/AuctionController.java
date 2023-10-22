@@ -13,19 +13,31 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class AuctionController {
+
+	private static final int BID_WHEN_ACCEPTED_IN_AUCTION_BUT_NO_BIDS_MADE = -1;
+
 	private String status = "Open";
 	private RestTemplate restTemplate = new RestTemplate();
-	private boolean isRequestReceivedToJoinAuction = false;
 	private int currentPrice;
 	private int priceIncrement;
 	private String currentWinningBidder;
 	private Map<String, Integer> bidsByBidders;
 
 	@RequestMapping("/receiveJoinRequest")
-	public ResponseEntity<String> receiveJoinRequest() {
-		System.out.println("Received a request to join the auction");
-		isRequestReceivedToJoinAuction = true;
-		return ResponseEntity.ok("Received a request to join the auction");
+	public ResponseEntity<String> receiveJoinRequest(@RequestParam("bidder") String bidder) {
+		System.out.println("Received a request from \"" + bidder + "\" to join the auction");
+		if (isValidJoinRequest(bidder)) {
+			bidsByBidders.put(bidder, BID_WHEN_ACCEPTED_IN_AUCTION_BUT_NO_BIDS_MADE);
+			return ResponseEntity.ok("Your request to join the auction has been accepted");
+		} else {
+			return new ResponseEntity<String>("Invalid auction join request. It that appears that"
+					+ " you are already participating in the aucion.", HttpStatus.BAD_REQUEST);
+		}
+
+	}
+
+	private boolean isValidJoinRequest(final String bidder) {
+		return !bidsByBidders.containsKey(bidder);
 	}
 
 	@RequestMapping("/openAuction")
@@ -47,6 +59,7 @@ public class AuctionController {
 
 	@RequestMapping("/getBidderJoinedStatus")
 	public ResponseEntity<String> getReceiveStatus(@RequestParam("bidder") String bidder) {
+		final  boolean isRequestReceivedToJoinAuction = bidsByBidders.containsKey(bidder);
 		System.out.println("Received a request to check whether bidder \"" + bidder +
 			"\" has joined the auction. My answer is " + isRequestReceivedToJoinAuction);
 		return ResponseEntity.ok("ReceiveStatus:" + isRequestReceivedToJoinAuction + " for bidder:" + bidder);
