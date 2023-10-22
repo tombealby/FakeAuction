@@ -15,8 +15,10 @@ import org.springframework.web.client.RestTemplate;
 public class AuctionController {
 
 	private static final int BID_WHEN_ACCEPTED_IN_AUCTION_BUT_NO_BIDS_MADE = -1;
+	private static final String INITIAL_STATUS = "Not started";
+	private static final String OPEN_STATUS = "Open";
 
-	private String status = "Open";
+	private String status = INITIAL_STATUS;
 	private RestTemplate restTemplate = new RestTemplate();
 	private int currentPrice;
 	private int priceIncrement;
@@ -24,7 +26,7 @@ public class AuctionController {
 	private Map<String, Integer> bidsByBidders;
 
 	@RequestMapping("/receiveJoinRequest")
-	public ResponseEntity<String> receiveJoinRequest(@RequestParam("bidder") String bidder) {
+	public ResponseEntity<String> receiveJoinRequest(@RequestParam("bidder") final String bidder) {
 		System.out.println("Received a request from \"" + bidder + "\" to join the auction");
 		if (isValidJoinRequest(bidder)) {
 			bidsByBidders.put(bidder, BID_WHEN_ACCEPTED_IN_AUCTION_BUT_NO_BIDS_MADE);
@@ -45,7 +47,7 @@ public class AuctionController {
 		this.bidsByBidders = new HashMap<>();
 		this.currentWinningBidder = "other bidder";
 		System.out.println("start auction with status open");
-		status = "Open";
+		status = OPEN_STATUS;
 		return ResponseEntity.ok("successfully opened the auction");
 	}
 	
@@ -58,11 +60,12 @@ public class AuctionController {
 	}
 
 	@RequestMapping("/getBidderJoinedStatus")
-	public ResponseEntity<String> getReceiveStatus(@RequestParam("bidder") String bidder) {
-		final  boolean isRequestReceivedToJoinAuction = bidsByBidders.containsKey(bidder);
+	public ResponseEntity<String> getBidderJoinedStatus(@RequestParam("bidder") final String bidder) {
+		final  boolean hasBidderJoinedAuction = bidsByBidders.containsKey(bidder);
 		System.out.println("Received a request to check whether bidder \"" + bidder +
-			"\" has joined the auction. My answer is " + isRequestReceivedToJoinAuction);
-		return ResponseEntity.ok("ReceiveStatus:" + isRequestReceivedToJoinAuction + " for bidder:" + bidder);
+			"\" has joined the auction. My answer is " + hasBidderJoinedAuction);
+		return ResponseEntity.ok("Bidder \"" + bidder + "\"" + (hasBidderJoinedAuction ? " has" : " has not")
+				+ " joined the auction.");
 	}
 
 	@RequestMapping("/getStatus")
