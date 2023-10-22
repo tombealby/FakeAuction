@@ -45,10 +45,11 @@ public class AuctionController {
 		return notifyParticipantsThatAuctionHasClosed();
 	}
 
-	@RequestMapping("/getReceiveStatus")
-	public ResponseEntity<String> getReceiveStatus() {
-		System.out.println("Received a request to check my receive status:" + isRequestReceivedToJoinAuction);
-		return ResponseEntity.ok("ReceiveStatus:" + isRequestReceivedToJoinAuction);
+	@RequestMapping("/getBidderJoinedStatus")
+	public ResponseEntity<String> getReceiveStatus(@RequestParam("bidder") String bidder) {
+		System.out.println("Received a request to check whether bidder \"" + bidder +
+			"\" has joined the auction. My answer is " + isRequestReceivedToJoinAuction);
+		return ResponseEntity.ok("ReceiveStatus:" + isRequestReceivedToJoinAuction + " for bidder:" + bidder);
 	}
 
 	@RequestMapping("/getStatus")
